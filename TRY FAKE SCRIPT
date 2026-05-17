@@ -1,0 +1,282 @@
+--// CINEMATIC FULLSCREEN LOADING + REALISTIC UI
+task.wait(0.2)
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local SoundService = game:GetService("SoundService")
+
+local player = Players.LocalPlayer
+
+--// CONFIG
+local GROUP_ID = 7529319087
+local GROUP_LINK = "https://www.roblox.com/communities/7529319087"
+
+--====================================================
+-- GUI
+--====================================================
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "UniversalHub"
+ScreenGui.IgnoreGuiInset = true
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+pcall(function()
+	gethui = gethui or get_hidden_gui
+	ScreenGui.Parent = gethui()
+end)
+
+if not ScreenGui.Parent then
+	ScreenGui.Parent = player.PlayerGui
+end
+
+--====================================================
+-- FULLSCREEN LOADING
+--====================================================
+
+local LoadingFrame = Instance.new("Frame")
+LoadingFrame.Parent = ScreenGui
+LoadingFrame.Size = UDim2.new(1,0,1,0)
+LoadingFrame.BackgroundColor3 = Color3.fromRGB(6,6,10)
+LoadingFrame.BorderSizePixel = 0
+
+-- Animated Glow Background
+for i = 1,6 do
+	local Glow = Instance.new("Frame")
+	Glow.Parent = LoadingFrame
+	Glow.AnchorPoint = Vector2.new(0.5,0.5)
+	Glow.Size = UDim2.new(0,400,0,400)
+	Glow.Position = UDim2.new(math.random(),0,math.random(),0)
+	Glow.BackgroundColor3 = Color3.fromRGB(
+		math.random(120,255),
+		math.random(120,255),
+		255
+	)
+	Glow.BackgroundTransparency = 0.85
+	Glow.BorderSizePixel = 0
+	
+	local Corner = Instance.new("UICorner")
+	Corner.CornerRadius = UDim.new(1,0)
+	Corner.Parent = Glow
+	
+	task.spawn(function()
+		while Glow.Parent do
+			TweenService:Create(
+				Glow,
+				TweenInfo.new(
+					math.random(4,8),
+					Enum.EasingStyle.Sine,
+					Enum.EasingDirection.InOut
+				),
+				{
+					Position = UDim2.new(math.random(),0,math.random(),0),
+					Size = UDim2.new(0,math.random(300,550),0,math.random(300,550))
+				}
+			):Play()
+			
+			task.wait(math.random(4,8))
+		end
+	end)
+end
+
+-- Dark Overlay Blur Feel
+local Overlay = Instance.new("Frame")
+Overlay.Parent = LoadingFrame
+Overlay.Size = UDim2.new(1,0,1,0)
+Overlay.BackgroundColor3 = Color3.fromRGB(0,0,0)
+Overlay.BackgroundTransparency = 0.35
+Overlay.BorderSizePixel = 0
+
+-- Logo
+local Logo = Instance.new("ImageLabel")
+Logo.Parent = LoadingFrame
+Logo.AnchorPoint = Vector2.new(0.5,0.5)
+Logo.Position = UDim2.new(0.5,0,0.38,0)
+Logo.Size = UDim2.new(0,140,0,140)
+Logo.BackgroundTransparency = 1
+Logo.Image = "rbxassetid://7072718362"
+Logo.ImageTransparency = 1
+
+-- Logo Animation
+TweenService:Create(
+	Logo,
+	TweenInfo.new(1.2, Enum.EasingStyle.Quint),
+	{
+		ImageTransparency = 0
+	}
+):Play()
+
+task.spawn(function()
+	while Logo.Parent do
+		TweenService:Create(
+			Logo,
+			TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
+			{
+				Rotation = 5
+			}
+		):Play()
+
+		task.wait(2)
+
+		TweenService:Create(
+			Logo,
+			TweenInfo.new(2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut),
+			{
+				Rotation = -5
+			}
+		):Play()
+
+		task.wait(2)
+	end
+end)
+
+-- Title
+local Title = Instance.new("TextLabel")
+Title.Parent = LoadingFrame
+Title.AnchorPoint = Vector2.new(0.5,0.5)
+Title.Position = UDim2.new(0.5,0,0.53,0)
+Title.Size = UDim2.new(0,600,0,60)
+Title.BackgroundTransparency = 1
+Title.Text = "Join First To Access!"
+Title.Font = Enum.Font.GothamBlack
+Title.TextSize = 36
+Title.TextColor3 = Color3.fromRGB(255,255,255)
+Title.TextTransparency = 1
+
+TweenService:Create(
+	Title,
+	TweenInfo.new(1),
+	{
+		TextTransparency = 0
+	}
+):Play()
+
+-- Subtitle
+local Subtitle = Instance.new("TextLabel")
+Subtitle.Parent = LoadingFrame
+Subtitle.AnchorPoint = Vector2.new(0.5,0.5)
+Subtitle.Position = UDim2.new(0.5,0,0.58,0)
+Subtitle.Size = UDim2.new(0,500,0,30)
+Subtitle.BackgroundTransparency = 1
+Subtitle.Text = "Initializing secure environment..."
+Subtitle.Font = Enum.Font.GothamMedium
+Subtitle.TextSize = 16
+Subtitle.TextColor3 = Color3.fromRGB(180,180,200)
+
+-- Loading Bar
+local BarBG = Instance.new("Frame")
+BarBG.Parent = LoadingFrame
+BarBG.AnchorPoint = Vector2.new(0.5,0.5)
+BarBG.Position = UDim2.new(0.5,0,0.67,0)
+BarBG.Size = UDim2.new(0,420,0,10)
+BarBG.BackgroundColor3 = Color3.fromRGB(30,30,40)
+BarBG.BorderSizePixel = 0
+
+Instance.new("UICorner", BarBG).CornerRadius = UDim.new(1,0)
+
+local Bar = Instance.new("Frame")
+Bar.Parent = BarBG
+Bar.Size = UDim2.new(0,0,1,0)
+Bar.BackgroundColor3 = Color3.fromRGB(255,120,255)
+Bar.BorderSizePixel = 0
+
+Instance.new("UICorner", Bar).CornerRadius = UDim.new(1,0)
+
+local Gradient = Instance.new("UIGradient")
+Gradient.Parent = Bar
+Gradient.Color = ColorSequence.new{
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(255,120,255)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(120,220,255))
+}
+
+-- Progress Text
+local Progress = Instance.new("TextLabel")
+Progress.Parent = LoadingFrame
+Progress.AnchorPoint = Vector2.new(0.5,0.5)
+Progress.Position = UDim2.new(0.5,0,0.72,0)
+Progress.Size = UDim2.new(0,200,0,25)
+Progress.BackgroundTransparency = 1
+Progress.Text = "0%"
+Progress.Font = Enum.Font.GothamBold
+Progress.TextSize = 16
+Progress.TextColor3 = Color3.fromRGB(255,255,255)
+
+-- Sound
+local IntroSound = Instance.new("Sound")
+IntroSound.Parent = SoundService
+IntroSound.SoundId = "rbxassetid://1843529274"
+IntroSound.Volume = 1
+IntroSound:Play()
+
+-- Fake Loading Animation
+local percent = 0
+
+task.spawn(function()
+	while percent < 100 do
+		percent += math.random(1,4)
+
+		if percent > 100 then
+			percent = 100
+		end
+
+		Progress.Text = percent.."%"
+
+		TweenService:Create(
+			Bar,
+			TweenInfo.new(0.25, Enum.EasingStyle.Linear),
+			{
+				Size = UDim2.new(percent/100,0,1,0)
+			}
+		):Play()
+
+		if percent < 35 then
+			Subtitle.Text = "Loading assets..."
+		elseif percent < 65 then
+			Subtitle.Text = "Checking permissions..."
+		elseif percent < 90 then
+			Subtitle.Text = "Preparing interface..."
+		else
+			Subtitle.Text = "Launching system..."
+		end
+
+		task.wait(0.08)
+	end
+end)
+
+task.wait(5)
+
+-- Exit Animation
+TweenService:Create(
+	LoadingFrame,
+	TweenInfo.new(1),
+	{
+		BackgroundTransparency = 1
+	}
+):Play()
+
+for _,v in pairs(LoadingFrame:GetDescendants()) do
+	if v:IsA("TextLabel") then
+		TweenService:Create(v,TweenInfo.new(0.8),{
+			TextTransparency = 1
+		}):Play()
+	elseif v:IsA("Frame") then
+		TweenService:Create(v,TweenInfo.new(0.8),{
+			BackgroundTransparency = 1
+		}):Play()
+	elseif v:IsA("ImageLabel") then
+		TweenService:Create(v,TweenInfo.new(0.8),{
+			ImageTransparency = 1
+		}):Play()
+	end
+end
+
+task.wait(1)
+LoadingFrame:Destroy()
+
+--====================================================
+-- MAIN UI STARTS HERE
+--====================================================
+
+-- your existing main ui here
+print("Loading Finished")
